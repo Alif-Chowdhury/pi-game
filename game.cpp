@@ -37,6 +37,7 @@ int main() {
     // Get actual window size (whatever the display really is)
     int winW = 0, winH = 0;
     SDL_GetRendererOutputSize(renderer, &winW, &winH);
+    std::cout << "Display size from SDL: " << winW << " x " << winH << std::endl;
 
     // Rectangle centered on screen
     SDL_Rect rect;
