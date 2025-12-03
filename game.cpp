@@ -2,13 +2,11 @@
 #include <iostream>
 
 int main() {
-    // Initialize SDL video
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         std::cout << "SDL_Init Error: " << SDL_GetError() << "\n";
         return 1;
     }
 
-    // Create fullscreen window
     SDL_Window* window = SDL_CreateWindow(
         "My Pi Game",
         SDL_WINDOWPOS_CENTERED,
@@ -36,45 +34,49 @@ int main() {
         return 1;
     }
 
+    // Get actual window size (whatever the display really is)
+    int winW = 0, winH = 0;
+    SDL_GetRendererOutputSize(renderer, &winW, &winH);
+
+    // Rectangle centered on screen
+    SDL_Rect rect;
+    rect.w = winW / 2;      // half the width
+    rect.h = winH / 3;      // one-third the height
+    rect.x = (winW - rect.w) / 2;
+    rect.y = (winH - rect.h) / 2;
+
     bool running = true;
     SDL_Event event;
 
-    // Simple main loop
     while (running) {
-        // Handle events
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 running = false;
-            }
-            if (event.type == SDL_KEYDOWN) {
-                // Press ESC to quit
-                if (event.key.keysym.sym == SDLK_ESCAPE) {
+            } else if (event.type == SDL_KEYDOWN) {
+                // ESC or Q to exit
+                if (event.key.keysym.sym == SDLK_ESCAPE ||
+                    event.key.keysym.sym == SDLK_q) {
                     running = false;
                 }
+            } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+                // tap / click anywhere to exit
+                running = false;
             }
         }
 
-        // Clear screen with a dark blue color
+        // Background (dark blue)
         SDL_SetRenderDrawColor(renderer, 10, 20, 60, 255);
         SDL_RenderClear(renderer);
 
-        // Draw a simple rectangle so you see something
-        SDL_Rect rect;
-        rect.x = 200;
-        rect.y = 120;
-        rect.w = 400;
-        rect.h = 240;
-
-        SDL_SetRenderDrawColor(renderer, 200, 200, 50, 255);
+        // Center rectangle (yellow)
+        SDL_SetRenderDrawColor(renderer, 230, 230, 60, 255);
         SDL_RenderFillRect(renderer, &rect);
 
-        // Show everything
         SDL_RenderPresent(renderer);
     }
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
-
     return 0;
 }
